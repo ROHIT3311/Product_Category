@@ -6,15 +6,19 @@ require("dotenv").config();
 const authRoutes = require("./routes/auth.routes");
 const partRoutes = require("./routes/part.routes");
 const reqPartsRoutes = require("./routes/reqParts.routes");
+const serverless = require("serverless-http"); // needed for Vercel
+
 const app = express();
-const PORT = process.env.PORT || 8000;
 
 // Connect to MongoDB Atlas
 connectDB();
 
+// Allow your frontend domain only
+const FRONTEND_URL = "https://product-category-xi.vercel.app/";
+
 app.use(
   cors({
-    origin: "*",
+    origin: FRONTEND_URL,
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -33,13 +37,8 @@ app.use("/api/req", reqPartsRoutes);
 
 // Default Route
 app.get("/", (req, res) => {
-  res.send("Default Route Working");
+  res.json({ message: "Default Route Working" }); // always return JSON
 });
 
-// Start Server
-// app.listen(PORT, () => {
-//   console.log(`Server is running on http://localhost:${PORT}`);
-// });
-
-// for vercel deployment
-module.exports = app;
+// Export for serverless
+module.exports = serverless(app);
