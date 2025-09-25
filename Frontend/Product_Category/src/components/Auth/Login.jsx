@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { login, resetAuthState } from "../../services/authSlice";
 import ReCAPTCHA from "react-google-recaptcha";
 
-const RECAPTCHA_SITE_KEY = "6LfGU5IrAAAAAJ5v9Gfd-jKeKtRqi04WpFoF_QwS";
+// const RECAPTCHA_SITE_KEY = "6LfGU5IrAAAAAJ5v9Gfd-jKeKtRqi04WpFoF_QwS";
 
 const Login = () => {
   const [form, setForm] = useState({
@@ -112,7 +112,7 @@ const Login = () => {
 
           <div className="flex justify-center mt-2">
             <ReCAPTCHA
-              sitekey={RECAPTCHA_SITE_KEY}
+              sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
               onChange={handleCaptchaChange}
             />
           </div>
