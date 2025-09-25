@@ -41,4 +41,10 @@ app.get("/", (req, res) => {
 });
 
 // Export for serverless
-module.exports = serverless(app);
+// module.exports = serverless(app);
+
+app.listen(process.env.PORT || 5000, () => {
+  console.log(`Server running on port ${process.env.PORT || 5000}`);
+});
+
+module.exports = app; // export app for serverless
