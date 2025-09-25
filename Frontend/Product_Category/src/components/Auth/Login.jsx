@@ -51,6 +51,8 @@ const Login = () => {
     dispatch(login({ email: form.email, password: form.password }));
   };
 
+  console.log("Captcha : ", import.meta.env.VITE_RECAPTCHA_SITE_KEY);
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-white px-4">
       <form
