@@ -23,7 +23,9 @@ router.post("/login", login);
 router.post("/verify-otp", verifyOtp);
 
 // isAuthenticated
-router.get("/isAuthenticated", isAuthenticated);
+router.get("/isAuthenticated", isAuthenticated, (req, res) => {
+  res.status(200).json({ success: true, user: req.user });
+});
 
 // Signout route
 router.post("/logout", logout);
