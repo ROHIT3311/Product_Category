@@ -3,14 +3,16 @@ import axios from "axios";
 
 const BASE_URL = "https://product-category-sget.vercel.app";
 
+const axiosInstance = axios.create({
+  baseURL: BASE_URL,
+  withCredentials: true, // ✅ Global setting
+});
+
 export const register = createAsyncThunk(
   "auth/register",
   async (FormData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        `${BASE_URL}/api/auth/register`,
-        FormData
-      );
+      const response = await axiosInstance.post("/api/auth/register", FormData);
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -24,13 +26,7 @@ export const login = createAsyncThunk(
   "auth/login",
   async (FormData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        `${BASE_URL}/api/auth/login`,
-        FormData,
-        {
-          withCredentials: true, // <-- Important to receive cookie
-        }
-      );
+      const response = await axiosInstance.post("/api/auth/login", FormData);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Login Failed");
@@ -42,13 +38,9 @@ export const verifyOtp = createAsyncThunk(
   "auth/verifyOtp",
   async ({ otp }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        `${BASE_URL}/api/auth/verify-otp`,
-        { otp },
-        {
-          withCredentials: true, // <-- Important to send cookie back
-        }
-      );
+      const response = await axiosInstance.post("/api/auth/verify-otp", {
+        otp,
+      });
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -62,11 +54,7 @@ export const logout = createAsyncThunk(
   "auth/logout",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        `${BASE_URL}/api/auth/logout`,
-        {},
-        { withCredentials: true } // Important for cookie-based auth
-      );
+      const response = await axiosInstance.post("/api/auth/logout", {});
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -93,7 +81,6 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Register
       .addCase(register.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -111,8 +98,6 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-
-      // Login cases
       .addCase(login.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -126,8 +111,6 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-
-      // Verify Otp
       .addCase(verifyOtp.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -141,8 +124,6 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-
-      // Logout
       .addCase(logout.fulfilled, (state) => {
         state.user = null;
         state.success = true;

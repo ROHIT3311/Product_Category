@@ -1,17 +1,20 @@
-// partSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
 const BASE_URL = "https://product-category-sget.vercel.app";
 
-// Async thunk for searching by VIN
-// partSlice.js
+const axiosInstance = axios.create({
+  baseURL: BASE_URL,
+  withCredentials: true, // ✅ always send cookies
+});
+
+// Search by VIN
 export const searchByVin = createAsyncThunk(
   "part/searchByVin",
   async (spn, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
-        `${BASE_URL}/api/part/searchByVin?spn=${spn}`
+      const response = await axiosInstance.get(
+        `/api/part/searchByVin?spn=${spn}`
       );
       return response.data;
     } catch (error) {
@@ -20,21 +23,26 @@ export const searchByVin = createAsyncThunk(
   }
 );
 
-// Async thunk for detailed part search
+// Detailed search
 export const searchParts = createAsyncThunk(
   "part/searchParts",
   async ({ part_no, product_name, model_name }, { rejectWithValue }) => {
     try {
       const queryParams = new URLSearchParams();
-      if (part_no) queryParams.append("part_no", part_no);
-      if (product_name) queryParams.append("product_name", product_name);
-      if (model_name) queryParams.append("model_name", model_name);
+      if (part_no) {
+        queryParams.append("part_no", part_no);
+      }
+      if (product_name) {
+        queryParams.append("product_name", product_name);
+      }
+      if (model_name) {
+        queryParams.append("model_name", model_name);
+      }
 
-      const response = await axios.get(
-        `${BASE_URL}/api/part/searchParts?${queryParams.toString()}`
+      const response = await axiosInstance.get(
+        `/api/part/searchParts?${queryParams.toString()}`
       );
 
-      // ✅ Always return an array
       if (response.data.projects) {
         return response.data.projects;
       } else if (response.data.img_link) {
@@ -52,7 +60,7 @@ export const searchParts = createAsyncThunk(
   }
 );
 
-// partSlice.js
+// Send product info by email
 export const sendProductInfo = createAsyncThunk(
   "part/sendProductInfo",
   async (
@@ -60,7 +68,7 @@ export const sendProductInfo = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const response = await axios.post(`${BASE_URL}/api/req/reqPart`, {
+      const response = await axiosInstance.post("/api/req/reqPart", {
         email,
         productCode,
         productName,
@@ -86,8 +94,6 @@ const partSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-
-      // Search by Vin
       .addCase(searchByVin.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -100,22 +106,18 @@ const partSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-
-      //   Search by Model, Product, Color
       .addCase(searchParts.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(searchParts.fulfilled, (state, action) => {
         state.loading = false;
-        state.parts = action.payload; // Note: `parts` from backend response
+        state.parts = action.payload;
       })
       .addCase(searchParts.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
-
-      // Send requested part by email
       .addCase(sendProductInfo.pending, (state) => {
         state.loading = true;
         state.error = null;
