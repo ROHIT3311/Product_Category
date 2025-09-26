@@ -197,7 +197,14 @@ module.exports.logout = async (req, res) => {
       return res.status(404).json({ message: "User not logged in" });
     }
 
-    res.clearCookie("token");
+    // Clear the cookie with the same options
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: true, // same as set in login
+      sameSite: "None", // same as set in login
+      path: "/", // default path
+    });
+
     return res.status(200).json({ message: "Signout Successful" });
   } catch (error) {
     console.log(error);
