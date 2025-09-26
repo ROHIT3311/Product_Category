@@ -100,11 +100,12 @@ module.exports.login = async (req, res) => {
     });
 
     // Set temp token in a cookie (HTTP-only, secure in production)
+    // in login
     res.cookie("temp_token", tempToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 5 * 60 * 1000, // 5 minutes
-      sameSite: "Strict",
+      secure: true, // required for SameSite=None
+      sameSite: "None", // ✅ allow cross-origin cookies
+      maxAge: 5 * 60 * 1000,
     });
 
     return res.status(200).json({
@@ -173,9 +174,9 @@ module.exports.verifyOtp = async (req, res) => {
       .clearCookie("temp_token")
       .cookie("token", loginToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production", // Set this to true in prod
-        sameSite: "Lax",
-        maxAge: 3 * 24 * 60 * 60 * 1000, // 3 days
+        secure: true, // required for SameSite=None
+        sameSite: "None", // ✅ allow cross-origin cookies
+        maxAge: 3 * 24 * 60 * 60 * 1000,
       })
       .status(200)
       .json({
